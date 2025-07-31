@@ -40,3 +40,8 @@ a {
     color-scheme: dark;
   }
 }
+
+.ant-pro-form-login-top .ant-pro-form-login-desc{
+  margin-block-end: 20px;
+  margin-top: 20px
+}
