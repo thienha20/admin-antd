@@ -1,7 +1,7 @@
 FROM node:20-alpine
 
 # Create app directory
-WORKDIR /hisense/frontend
+WORKDIR /chatbot/frontend
 
 ENV NODE_OPTIONS=--max_old_space_size=4096
 # Install app dependencies

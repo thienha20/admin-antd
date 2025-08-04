@@ -19,7 +19,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Roboto', 'Roboto Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -41,7 +41,57 @@ a {
   }
 }
 
+/* Ghi đè font cho các component Ant Design */
+.ant-typography,
+.ant-btn,
+.ant-input,
+.ant-menu,
+.ant-dropdown,
+.ant-select,
+.ant-modal-title,
+.ant-notification {
+  font-family: 'Roboto', 'Roboto Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
+}
+
 .ant-pro-form-login-top .ant-pro-form-login-desc{
   margin-block-end: 20px;
   margin-top: 20px
+}
+.ant-form-item{
+  margin-bottom: 5px !important;
+}
+.form-flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.form-item {
+  flex: 1 1 calc(25% - 8px); /* Default: 4 per row */
+  min-width: 200px;
+  max-width: calc(25% - 8px);
+}
+
+/* Medium screens: 3 per row */
+@media (max-width: 992px) {
+  .form-item {
+    flex: 1 1 calc(33.3333% - 8px);
+    max-width: unset
+  }
+}
+
+/* Small screens: 1 per row */
+@media (max-width: 768px) {
+  .form-item {
+    flex: 1 1 calc(50% - 8px);
+    max-width: unset
+  }
+}
+
+/* Small screens: 1 per row */
+@media (max-width: 576px) {
+  .form-item {
+    flex: 1 1 100%;
+    max-width: unset
+  }
 }

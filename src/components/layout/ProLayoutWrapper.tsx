@@ -1,20 +1,19 @@
 'use client';
 
 import {
-  DashboardOutlined,
-  ContainerOutlined,
   UserOutlined,
-  QuestionCircleOutlined,
-  SettingOutlined,
-  WechatOutlined,
   LogoutOutlined,
-  SafetyOutlined
+  SafetyOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
-import {Dropdown, Grid } from 'antd';
+import { Dropdown, Grid } from 'antd';
+import { checkPermission, permissions } from '@/utils/permission';
+import { getPermissionKey, MenuType } from '@/components/layout/Menu';
+import { UserContext } from '@/app/contexts/UserProvider';
+import CustomFooter from '@/components/layout/Footer';
 
 const DynamicSettingDrawer = dynamic(() => import('./SettingDrawerClient'), {
   ssr: false,
@@ -23,84 +22,6 @@ const DynamicProLayout = dynamic(() => import('./ProLayoutClient'), {
   ssr: false,
 });
 
-const menuData = [
-  {
-    path: '/',
-    name: 'Dashboard',
-    icon: <DashboardOutlined/>,
-  },
-  {
-    path: '/chat-histories',
-    name: 'Lịch sử chat',
-    icon: <WechatOutlined/>,
-  },
-  {
-    path: '/subscribe',
-    name: 'Đánh nhãn dữ liệu',
-    icon: <ContainerOutlined/>,
-    routes: [
-      {
-        path: '/subscribe/faqs',
-        name: 'Hỏi đáp',
-        icon_path: <QuestionCircleOutlined/>,
-        permission: 'faq.index',
-      },
-      {
-        path: '/subscribe/documents',
-        icon_path: <QuestionCircleOutlined/>,
-        name: 'Tài liệu nhập',
-        permission: 'document.index',
-      },
-      {
-        path: '/subscribe/files',
-        icon_path: <QuestionCircleOutlined/>,
-        name: 'Tài liệu file',
-        permission: 'file.index',
-      },
-      {
-        path: '/subscribe/voices',
-        icon_path: <QuestionCircleOutlined/>,
-        name: 'Tài liệu âm thanh',
-        permission: 'voice.index',
-      },
-      {
-        path: '/subscribe/ocrs',
-        icon_path: <QuestionCircleOutlined/>,
-        name: 'Tài liệu hình ảnh',
-        permission: 'ocr.index',
-      },
-      {
-        path: '/categories',
-        icon_path: <QuestionCircleOutlined/>,
-        name: 'Nhóm tài liệu',
-        permission: 'category.index',
-      },
-    ],
-  },
-  {
-    path: '/user-manage',
-    name: 'Quản lý tài khoản',
-    icon: <UserOutlined/>,
-    routes: [
-      {
-        path: '/users',
-        name: 'Tài khoản',
-        permission: 'user.index',
-      },
-      {
-        path: '/user-groups',
-        name: 'Phân quyền',
-        permission: 'usergroup.index',
-      },
-    ],
-
-  },
-  {
-    path: '/settings',
-    name: 'Cấu hình',
-    icon: <SettingOutlined/>,
-  },
-];
 
 const CMSLogo = () => (
   <>
@@ -145,23 +66,52 @@ const CMSLogo = () => (
 );
 
 export default function ProLayoutWrapper({children}: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState<Record<string, any>>({});
+  const [menuData, setMenuData] = useState<MenuType[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const {me, user} = useContext(UserContext);
   const pathname = usePathname();
   const {useBreakpoint} = Grid;
   const screens = useBreakpoint();
   const contentPadding = screens.md ? 20 : 5;
+
+  // useEffect(() => {
+  //   me().then((user) => {
+  //     const params = new URLSearchParams(window.location.search);
+  //     if (user.userId) {
+  //       const permission: boolean = checkPermission(user, getPermissionKey());
+  //       if (!permission) {
+  //         router.push('/access-denied');
+  //       }
+  //     } else {
+  //       if (!params || params.toString() == '') {
+  //         router.push('/login');
+  //       } else {
+  //         router.push('/login?redirect=' + decodeURIComponent(window.location.href));
+  //       }
+  //     }
+  //     setLoading(false);
+  //   });
+  // }, [me, router]);
+  //
+  // useEffect(() => {
+  //   setMenuData(permissions(user));
+  // }, [user]);
+
   return (
     <>
       <DynamicProLayout
         {...settings}
+        loading={loading}
+        siderWidth={256}
         title=""
         logo={<CMSLogo/>}
         layout="mix"
         fixSiderbar
         avatarProps={{
           icon: <UserOutlined/>,
-          title: 'Serati Ma',
+          title: `${user.first_name}${user.first_name ? ` ${user.first_name}` : ''}`,
           size: 'small',
           render: (props, dom) => {
             return (
@@ -172,22 +122,22 @@ export default function ProLayoutWrapper({children}: { children: React.ReactNode
                       key: 'user',
                       label: 'Thông tin tài khoản',
                       icon: <UserOutlined/>,
-                      onClick: () => router.push('/profile')
+                      onClick: () => router.push('/profile'),
                     },
                     {
                       key: 'password',
                       label: 'Cập nhật mật khẩu',
                       icon: <SafetyOutlined/>,
-                      onClick: () => router.push('/profile/password')
+                      onClick: () => router.push('/profile/password'),
                     },
                     {
-                      type: 'divider'
+                      type: 'divider',
                     },
                     {
                       icon: <LogoutOutlined color={'red'}/>,
                       key: 'logout',
                       label: 'Đăng xuất',
-                      danger: true
+                      danger: true,
                     },
                   ],
                 }}
@@ -209,6 +159,7 @@ export default function ProLayoutWrapper({children}: { children: React.ReactNode
         contentStyle={{
           padding: contentPadding,
         }}
+        footerRender={() => <CustomFooter />}
       >
         {children}
       </DynamicProLayout>

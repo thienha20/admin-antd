@@ -53,7 +53,7 @@ export const pushQueryUrl = (key: string, value: string | null) => {
 
 export const removeQueryUrl = (key: string | string[]) => {
   const params = new URLSearchParams(window.location.search);
-  if(typeof key === 'string'){
+  if (typeof key === 'string') {
     params.delete(key);
   } else {
     for (const k of key) {
@@ -64,3 +64,33 @@ export const removeQueryUrl = (key: string | string[]) => {
   history.replaceState(null, '', `${url}?${params.toString()}`);
 };
 
+export const buildQueryUrl = (obj: Record<string, any> | null, page: number = 1) => {
+  const url = window.location.origin + window.location.pathname;
+  if (!obj) {
+    if (page > 1) return url + '?page=' + page;
+    return url;
+  }
+  const params: string[] = [];
+  for (const k in obj) {
+    if (k == 'created_at' && Array.isArray(obj[k])) {
+      params.push(`created_from=${obj[k][0]}`);
+      if (obj[k][1]) params.push(`created_to=${obj[k][1]}`);
+    } else {
+      if (k == 'updated_at' && Array.isArray(obj[k])) {
+        params.push(`updated_from=${obj[k][0]}`);
+        if (obj[k][1]) params.push(`updated_to=${obj[k][1]}`);
+      } else {
+        if (Array.isArray(obj[k])) {
+          params.push(`${k}=${obj[k].join(',')}`);
+        } else {
+          if (typeof obj[k] === 'object') {
+            params.push(`${k}=${JSON.stringify(obj[k])}`);
+          } else {
+            params.push(`${k}=${obj[k]}`);
+          }
+        }
+      }
+    }
+  }
+  return url + (params.length > 0 ? `?${params.join('&')}${page > 1 ? `&page=${page}` : ''}` : `${page > 1 ? `?page=${page}` : ''}`);
+};

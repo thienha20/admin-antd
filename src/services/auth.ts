@@ -4,14 +4,14 @@ import { Response } from '@/schemas/query';
 import md5 from 'md5';
 
 export const actionLogin = async (email: string, password: string) => {
-  return await api.post<Partial<User>>('/auth/login', {
+  return await api.post<User>('/auth/login', {
     email,
     password,
   });
 };
 
-export const actionAccount = async (data: Partial<User>) => {
-  return await api.post<Partial<User>>('/auth/profile-update', {
+export const actionAccount = async (data: User) => {
+  return await api.post<User>('/auth/profile-update', {
     ...data,
   });
 };
@@ -42,7 +42,7 @@ export const actionDeleteAccount = async (userId: number, secret: string) => {
   });
 };
 
-export const actionRegisterAccount = async (data: Partial<User>) => {
+export const actionRegisterAccount = async (data: User) => {
   return await api.post<boolean>('/auth/register', {
     ...data,
   });

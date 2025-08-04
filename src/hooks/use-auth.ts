@@ -15,7 +15,7 @@ export type LoginResult = {
 const useAuth = () => {
   const [user, setUser] = React.useState<Partial<User>>({});
   const route = useRouter();
-  const signOut = () => {
+  const signOut = useCallback(() => {
     api.post<boolean>("auth/logout", {}).then(r => {
       if(r) {
         localStorage.removeItem('accessToken');
@@ -23,7 +23,7 @@ const useAuth = () => {
         route.push('/login')
       }
     });
-  };
+  }, [route]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     return await api.post<LoginResult>('/auth/login', {
@@ -54,13 +54,13 @@ const useAuth = () => {
           signOut();
           return {};
         }
-      }).catch((e) => {
+      }).catch(() => {
         return {};
       });
     } else {
       return {};
     }
-  }, []);
+  }, [signOut]);
 
   return {
     user,

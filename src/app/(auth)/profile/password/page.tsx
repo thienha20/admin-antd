@@ -7,26 +7,24 @@ import { useRouter } from 'next/navigation';
 export default function ProfilePasswordPage() {
   const router = useRouter();
   return (
-    <div>
-      <Card>
-        <Tabs activeKey={'2'}
-              items={[{
-                title: 'Thông tin cá nhân',
-                children: <BasicInfoForm/>,
-              }, {
-                title: 'Bảo mật',
-                children: <SecuritySettings/>,
-              }].map((item, i) => {
-                const id = String(i + 1);
-                return {
-                  key: id,
-                  label: item.title,
-                  children: item.children,
-                };
-              })}
-              onChange={() => router.push('/profile')}>
-        </Tabs>
-      </Card>
-    </div>
+    <Card>
+      <Tabs activeKey={'2'}
+            items={[{
+              title: 'Thông tin cá nhân',
+              children: <BasicInfoForm/>,
+            }, {
+              title: 'Bảo mật',
+              children: <SecuritySettings/>,
+            }].map((item, i) => {
+              const id = String(i + 1);
+              return {
+                key: id,
+                label: item.title,
+                children: item.children,
+              };
+            })}
+            onChange={() => router.push('/profile')}>
+      </Tabs>
+    </Card>
   );
 }
