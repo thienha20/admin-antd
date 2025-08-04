@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 export function paramCase(str: string): string {
   return str
@@ -26,11 +26,11 @@ export function toQuery(obj: Record<string, any>): string {
   return Object.entries(obj)
     .flatMap(([key, value]) => {
       // Bỏ qua undefined và null
-      if (value === undefined || value === null) return [];
+      if (value === undefined || value === null) return '';
 
       // Set → Array
       if (value instanceof Set) {
-        value = Array.from(value);
+        value = Array.from(value).join(',');
       }
 
       // Array → joined string
@@ -40,22 +40,42 @@ export function toQuery(obj: Record<string, any>): string {
 
       // Date → format
       if (value instanceof Date) {
-        const formatted = dayjs(value).format("YYYY-MM-DD HH:mm:ss");
+        const formatted = dayjs(value).format('YYYY-MM-DD HH:mm:ss');
         return `${encodeURIComponent(key)}=${encodeURIComponent(formatted)}`;
       }
 
       // BigInt → string
-      if (typeof value === "bigint") {
+      if (typeof value === 'bigint') {
         return `${encodeURIComponent(key)}=${encodeURIComponent(value.toString())}`;
       }
 
       // Object → JSON (không phải Date/Array/Set)
-      if (typeof value === "object") {
+      if (typeof value === 'object') {
         return `${encodeURIComponent(key)}=${encodeURIComponent(JSON.stringify(value))}`;
       }
 
       // boolean / string / number
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     })
-    .join("&");
+    .join('&');
+}
+
+export function convertStringData(value: any) {
+  if (value === undefined || value === null) return '';
+  if (value instanceof Set) {
+    value = Array.from(value).join(',');
+  }
+  if (Array.isArray(value)) {
+    return value.join(',');
+  }
+  if (value instanceof Date) {
+    return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
+  }
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return value;
 }

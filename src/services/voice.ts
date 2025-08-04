@@ -1,7 +1,7 @@
 import { Pagination, FileParam } from '@/schemas/query';
-import { VoiceType } from '@/schemas/subcribe';
+import { FileType, VoiceType } from '@/schemas/subcribe';
 import api from '@/utils/fetchData';
-import { toQuery } from '@/utils/change-case';
+import { convertStringData, toQuery } from '@/utils/change-case';
 
 export const actionGetVoices = async (params?: FileParam) => {
   const queryString = params ? `?${toQuery(params)}` : '';
@@ -9,19 +9,24 @@ export const actionGetVoices = async (params?: FileParam) => {
 };
 
 
-export const actionCreateVoice = async (data: VoiceType) => {
-  return await api.post<VoiceType>(`/subscribe/voices`, {
-    ...data,
-  });
-};
-
 export const actionGetVoice = async (id: bigint) => {
-  return await api.get<VoiceType>(`/subscribe/voices/${id}`);
+  return await api.get<FileType>(`/subscribe/voices/${id}`);
 };
 
-export const actionUpdateVoice = async (id: bigint, data: VoiceType) => {
-  return await api.put<VoiceType>(`/subscribe/voices/${id}`, {
+export const actionUpdateVoice = async (id: bigint, data: FileType, file?: File) => {
+  const formData = new FormData();
+  if (file) {
+    formData.append('file', file);
+  }
+  for (const [key, value] of Object.entries(data)) {
+    formData.append(key, convertStringData(value));
+  }
+  return await api.put<FileType>(`/subscribe/cors/${id}`, {
     ...data,
+  }, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 };
 

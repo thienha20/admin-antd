@@ -1,7 +1,7 @@
 import { Pagination, FileParam } from '@/schemas/query';
-import { OcrType } from '@/schemas/subcribe';
+import { FileType, OcrType } from '@/schemas/subcribe';
 import api from '@/utils/fetchData';
-import { toQuery } from '@/utils/change-case';
+import { convertStringData, toQuery } from '@/utils/change-case';
 
 export const actionGetOcrs = async (params?: FileParam) => {
   const queryString = params ? `?${toQuery(params)}` : '';
@@ -9,19 +9,39 @@ export const actionGetOcrs = async (params?: FileParam) => {
 };
 
 
-export const actionCreateOcr = async (data: OcrType) => {
-  return await api.post<OcrType>(`/subscribe/ocrs`, {
+export const actionCreateOcr = async (data: FileType, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  for (const [key, value] of Object.entries(data)) {
+    formData.append(key, convertStringData(value));
+  }
+  return await api.post<FileType>(`/subscribe/ocrs`, {
     ...data,
+  }, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 };
 
 export const actionGetOcr = async (id: bigint) => {
-  return await api.get<OcrType>(`/subscribe/ocrs/${id}`);
+  return await api.get<FileType>(`/subscribe/ocrs/${id}`);
 };
 
-export const actionUpdateOcr = async (id: bigint, data: OcrType) => {
-  return await api.put<OcrType>(`/subscribe/ocrs/${id}`, {
+export const actionUpdateOcr = async (id: bigint, data: FileType, file?: File) => {
+  const formData = new FormData();
+  if (file) {
+    formData.append('file', file);
+  }
+  for (const [key, value] of Object.entries(data)) {
+    formData.append(key, convertStringData(value));
+  }
+  return await api.put<FileType>(`/subscribe/cors/${id}`, {
     ...data,
+  }, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   });
 };
 
