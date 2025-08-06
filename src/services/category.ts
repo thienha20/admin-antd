@@ -1,5 +1,5 @@
 import { Pagination, CategoryParam } from '@/schemas/query';
-import { CategoryType } from '@/schemas/subcribe';
+import { CategoryType, TreeCategory } from '@/schemas/subcribe';
 import api from '@/utils/fetchData';
 import { toQuery } from '@/utils/change-case';
 
@@ -17,6 +17,10 @@ export const actionCreateCategory = async (data: CategoryType) => {
 
 export const actionGetCategory = async (id: number) => {
   return await api.get<CategoryType>(`/categories/${id}`);
+};
+
+export const actionGetTreeCategory = async (root: number = 0, nId?: number ) => {
+  return await api.get<TreeCategory[]>(`/categories/tree?root=${root}${nId && nId > 0 ? `&nId=${nId}` : ''}`);
 };
 
 export const actionUpdateCategory = async (id: number, data: CategoryType) => {

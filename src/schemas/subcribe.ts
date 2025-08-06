@@ -101,3 +101,9 @@ export type FileCategoryType = {
   file?: FileType | VoiceType | DocumentType | OcrType
 }
 
+export type TreeCategory = {
+  id?: number,
+  name?:string,
+  description?: string,
+  children?: TreeCategory[]
+}
